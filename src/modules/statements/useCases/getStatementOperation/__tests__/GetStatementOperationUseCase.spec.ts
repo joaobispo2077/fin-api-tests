@@ -65,4 +65,13 @@ describe('Use case - [GetStatementOperationUseCases]', () => {
       .toEqual(new GetStatementOperationError.StatementNotFound());
   });
 
+
+  it('should not be able to get statement by id and user id if there is no user', async () => {
+    await expect(sutGetStatementOperationUseCase.execute({
+      statement_id: faker.datatype.uuid(),
+      user_id: faker.datatype.uuid()
+    }))
+      .rejects
+      .toEqual(new GetStatementOperationError.UserNotFound());
+  });
 });
