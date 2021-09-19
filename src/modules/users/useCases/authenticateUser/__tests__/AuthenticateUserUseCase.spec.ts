@@ -3,6 +3,7 @@ import faker from 'faker';
 import { InMemoryUsersRepository } from "../../../repositories/in-memory/InMemoryUsersRepository";
 import { CreateUserUseCase } from '../../createUser/CreateUserUseCase';
 import { AuthenticateUserUseCase } from '../AuthenticateUserUseCase';
+import { IncorrectEmailOrPasswordError } from '../IncorrectEmailOrPasswordError';
 
 const usersRepositoryInMemory = new InMemoryUsersRepository();
 const createUserUseCase = new CreateUserUseCase(usersRepositoryInMemory);
@@ -15,8 +16,6 @@ describe('Use case - [AuthenticateUserUseCase]', () => {
       email: faker.internet.email(),
       password: faker.internet.password()
     };
-
-    console.log('user is',user);
 
     const createdUser = await createUserUseCase.execute(user);
 
@@ -35,5 +34,22 @@ describe('Use case - [AuthenticateUserUseCase]', () => {
     };
 
     expect(auth).toEqual(expect.objectContaining(expectedAuthPayload));
+  });
+
+  it('should not be able to authenticate an user with wrong credentials', async () => {
+    const user = {
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password()
+    };
+
+    await createUserUseCase.execute(user);
+
+    await expect(sutAuthenticateUserUseCase.execute({
+      email: user.email,
+      password: user.password + 'wrong'
+    })).rejects.toEqual(
+      new IncorrectEmailOrPasswordError()
+    );
   });
 });
