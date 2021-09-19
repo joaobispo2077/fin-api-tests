@@ -6,6 +6,7 @@ import { OperationType } from '../../../entities/Statement';
 import { InMemoryStatementsRepository } from '../../../repositories/in-memory/InMemoryStatementsRepository';
 import { CreateStatementUseCase } from '../../createStatement/CreateStatementUseCase';
 import { ICreateStatementDTO } from '../../createStatement/ICreateStatementDTO';
+import { GetStatementOperationError } from '../GetStatementOperationError';
 import { GetStatementOperationUseCase } from '../GetStatementOperationUseCase';
 
 const usersRepositoryInMemory = new InMemoryUsersRepository();
@@ -48,4 +49,20 @@ describe('Use case - [GetStatementOperationUseCases]', () => {
 
     expect(recoveredStatement).toEqual(createdStatement);
   });
+
+  it('should not be able to get statement by id and user id if there is no statement', async () => {
+    const createdUser = await usersRepositoryInMemory.create({
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password()
+    });
+
+    await expect(sutGetStatementOperationUseCase.execute({
+      statement_id: faker.datatype.uuid(),
+      user_id: createdUser.id as string
+    }))
+      .rejects
+      .toEqual(new GetStatementOperationError.StatementNotFound());
+  });
+
 });
