@@ -50,4 +50,37 @@ describe('Use case - [CreateStatementUseCase]', () => {
 
     expect(statementResult).toEqual(expectedStatementResult);
   });
+
+  it('should be able to create a withdraw statement if have sufficient amount', async () => {
+    const createdUser = await usersRepositoryInMemory.create({
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password()
+    });
+
+    const statementDeposit: ICreateStatementDTO = {
+      user_id: createdUser.id as string,
+      description: faker.lorem.words(),
+      amount: faker.datatype.number(configMockMediumAmount),
+      type: OperationType.DEPOSIT,
+    };
+
+    const statementWithdraw: ICreateStatementDTO = {
+      user_id: createdUser.id as string,
+      description: faker.lorem.words(),
+      amount: faker.datatype.number(configMockLowerAmount),
+      type: OperationType.WITHDRAW,
+    };
+
+    await sutCreateStatementUseCase.execute(statementDeposit);
+
+    const statementWidthdrawResult = await sutCreateStatementUseCase.execute(statementWithdraw);
+
+    const expectedStatementResult = {
+      ...statementWidthdrawResult,
+      id: expect.any(String),
+    };
+
+    expect(statementWidthdrawResult).toEqual(expectedStatementResult);
+  });
 });
