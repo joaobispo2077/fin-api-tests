@@ -112,4 +112,30 @@ describe('Use case - [CreateStatementUseCase]', () => {
       .rejects
       .toEqual(new CreateStatementError.InsufficientFunds());
   });
+
+  it('should not be able to create a statement if user provided not exists', async () => {
+    const userIdNotExists = faker.datatype.uuid();
+
+    const statementDeposit: ICreateStatementDTO = {
+      user_id: userIdNotExists,
+      description: faker.lorem.words(),
+      amount: faker.datatype.number(lowerAmount),
+      type: OperationType.DEPOSIT,
+    };
+
+    const statementWithdraw: ICreateStatementDTO = {
+      user_id: userIdNotExists,
+      description: faker.lorem.words(),
+      amount: faker.datatype.number(higherAmount),
+      type: OperationType.WITHDRAW,
+    };
+
+    await expect(sutCreateStatementUseCase.execute(statementDeposit))
+      .rejects
+      .toEqual(new CreateStatementError.UserNotFound());
+
+    await expect(sutCreateStatementUseCase.execute(statementWithdraw))
+      .rejects
+      .toEqual(new CreateStatementError.UserNotFound());
+  });
 });
