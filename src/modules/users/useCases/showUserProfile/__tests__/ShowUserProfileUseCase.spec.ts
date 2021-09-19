@@ -1,6 +1,7 @@
 import faker from 'faker';
 
 import { InMemoryUsersRepository } from "../../../repositories/in-memory/InMemoryUsersRepository";
+import { ShowUserProfileError } from '../ShowUserProfileError';
 import { ShowUserProfileUseCase } from '../ShowUserProfileUseCase';
 
 const usersRepositoryInMemory = new InMemoryUsersRepository();
@@ -24,5 +25,11 @@ describe('Use case - [ShowUserProfileUseCase]', () => {
     };
 
     expect(user).toEqual(expect.objectContaining(expectedUser));
+  });
+
+  it('should not be able to show user profile by user id that not exists', async () => {
+    await expect(sutShowUserProfileUseCase.execute(faker.datatype.uuid()))
+      .rejects
+      .toEqual(new ShowUserProfileError());
   });
 });
