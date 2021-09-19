@@ -4,27 +4,28 @@ import { InMemoryStatementsRepository } from '../../../repositories/in-memory/In
 import { ICreateStatementDTO } from '../ICreateStatementDTO';
 import { CreateStatementUseCase } from '../CreateStatementUseCase';
 import { OperationType } from '../../../entities/Statement';
+import { rejects } from 'assert';
+import { CreateStatementError } from '../CreateStatementError';
 
 const usersRepositoryInMemory = new InMemoryUsersRepository();
 const statementsRepositoryInMemory = new InMemoryStatementsRepository();
 
 const sutCreateStatementUseCase = new CreateStatementUseCase(usersRepositoryInMemory, statementsRepositoryInMemory);
 
-const configMockHigherAmount = {
+const higherAmount = {
   'min': 1200,
   'max': 900
 };
 
-const configMockMediumAmount = {
+const mediumAmount = {
   'min': 500,
   'max': 700
 };
 
-const configMockLowerAmount = {
+const lowerAmount = {
   'min': 2,
   'max': 50
 };
-
 
 describe('Use case - [CreateStatementUseCase]', () => {
   it('should be able to create a deposit statement', async () => {
@@ -37,7 +38,7 @@ describe('Use case - [CreateStatementUseCase]', () => {
     const statement: ICreateStatementDTO = {
       user_id: createdUser.id as string,
       description: faker.lorem.words(),
-      amount: faker.datatype.number(configMockMediumAmount),
+      amount: faker.datatype.number(mediumAmount),
       type: OperationType.DEPOSIT,
     };
 
@@ -61,14 +62,14 @@ describe('Use case - [CreateStatementUseCase]', () => {
     const statementDeposit: ICreateStatementDTO = {
       user_id: createdUser.id as string,
       description: faker.lorem.words(),
-      amount: faker.datatype.number(configMockMediumAmount),
+      amount: faker.datatype.number(mediumAmount),
       type: OperationType.DEPOSIT,
     };
 
     const statementWithdraw: ICreateStatementDTO = {
       user_id: createdUser.id as string,
       description: faker.lorem.words(),
-      amount: faker.datatype.number(configMockLowerAmount),
+      amount: faker.datatype.number(lowerAmount),
       type: OperationType.WITHDRAW,
     };
 
@@ -82,5 +83,33 @@ describe('Use case - [CreateStatementUseCase]', () => {
     };
 
     expect(statementWidthdrawResult).toEqual(expectedStatementResult);
+  });
+
+  it('should not be able to create a withdraw statement if there is no sufficient amount', async () => {
+    const createdUser = await usersRepositoryInMemory.create({
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password()
+    });
+
+    const statementDeposit: ICreateStatementDTO = {
+      user_id: createdUser.id as string,
+      description: faker.lorem.words(),
+      amount: faker.datatype.number(lowerAmount),
+      type: OperationType.DEPOSIT,
+    };
+
+    const statementWithdraw: ICreateStatementDTO = {
+      user_id: createdUser.id as string,
+      description: faker.lorem.words(),
+      amount: faker.datatype.number(higherAmount),
+      type: OperationType.WITHDRAW,
+    };
+
+    await sutCreateStatementUseCase.execute(statementDeposit);
+
+    await expect(sutCreateStatementUseCase.execute(statementWithdraw))
+      .rejects
+      .toEqual(new CreateStatementError.InsufficientFunds());
   });
 });
