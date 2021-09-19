@@ -1,20 +1,23 @@
 import faker from 'faker';
+
 import { InMemoryUsersRepository } from '../../../../users/repositories/in-memory/InMemoryUsersRepository';
 import { InMemoryStatementsRepository } from '../../../repositories/in-memory/InMemoryStatementsRepository';
 import { ICreateStatementDTO } from '../ICreateStatementDTO';
 import { CreateStatementUseCase } from '../CreateStatementUseCase';
 import { OperationType } from '../../../entities/Statement';
-import { rejects } from 'assert';
 import { CreateStatementError } from '../CreateStatementError';
 
 const usersRepositoryInMemory = new InMemoryUsersRepository();
 const statementsRepositoryInMemory = new InMemoryStatementsRepository();
 
-const sutCreateStatementUseCase = new CreateStatementUseCase(usersRepositoryInMemory, statementsRepositoryInMemory);
+const sutCreateStatementUseCase = new CreateStatementUseCase(
+  usersRepositoryInMemory,
+  statementsRepositoryInMemory
+);
 
 const higherAmount = {
-  'min': 1200,
-  'max': 900
+  'min': 900,
+  'max': 1200
 };
 
 const mediumAmount = {
@@ -27,7 +30,9 @@ const lowerAmount = {
   'max': 50
 };
 
+
 describe('Use case - [CreateStatementUseCase]', () => {
+
   it('should be able to create a deposit statement', async () => {
     const createdUser = await usersRepositoryInMemory.create({
       name: faker.name.findName(),
