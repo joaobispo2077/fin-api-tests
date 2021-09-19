@@ -1,4 +1,5 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+require('dotenv/config');
 const { resolve } = require('path');
 const root = resolve(__dirname);
 

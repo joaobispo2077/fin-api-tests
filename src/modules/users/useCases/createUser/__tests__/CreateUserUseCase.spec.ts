@@ -15,8 +15,6 @@ describe('Use case - [CreateUserUseCase]', () => {
       password: faker.internet.password()
     };
 
-    console.log('user is ', user);
-
     const createdUser = await sutCreateUserUseCase.execute(user);
 
     const expectedUser = {
