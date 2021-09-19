@@ -4,10 +4,10 @@ const root = resolve(__dirname);
 
 module.exports = {
   rootDir: root,
-  displayName: 'unit-test',
+  displayName: 'unit-tests',
   preset: 'ts-jest',
   testEnvironment: 'node',
   clearMocks: true,
-  testMatch: ['<rootDir>/src/**/*.(spec|test).ts'],
+  testMatch: ['<rootDir>/src/**/*.spec.ts'],
   testPathIgnorePatterns: ['\\\\node_modules\\\\'],
 };
