@@ -48,8 +48,23 @@ describe('Use case - [AuthenticateUserUseCase]', () => {
     await expect(sutAuthenticateUserUseCase.execute({
       email: user.email,
       password: user.password + 'wrong'
-    })).rejects.toEqual(
-      new IncorrectEmailOrPasswordError()
-    );
+    }))
+      .rejects
+      .toEqual(
+        new IncorrectEmailOrPasswordError()
+      );
+  });
+
+  it('should not be able to authenticate an user that not exists', async () => {
+    const auth = {
+      email: faker.internet.email(),
+      password: faker.internet.password()
+    };
+
+    await expect(sutAuthenticateUserUseCase.execute(auth))
+      .rejects
+      .toEqual(
+        new IncorrectEmailOrPasswordError()
+      );
   });
 });
