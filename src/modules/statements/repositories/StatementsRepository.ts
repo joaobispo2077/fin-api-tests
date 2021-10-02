@@ -18,6 +18,7 @@ export class StatementsRepository implements IStatementsRepository {
     amount,
     description,
     type,
+    sender_id,
   }: ICreateStatementDTO): Promise<Statement> {
     console.log({ user_id, amount, description, type });
 
@@ -26,6 +27,7 @@ export class StatementsRepository implements IStatementsRepository {
       amount,
       description,
       type,
+      sender_id,
     });
 
     return await this.repository.save(statement);
