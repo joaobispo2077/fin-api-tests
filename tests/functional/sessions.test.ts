@@ -38,4 +38,28 @@ describe("Sessions functional tests", () => {
 
     expect(response.status).toBe(401);
   });
+
+  it("should be able to recover user profile data when user is authenticated", async () => {
+    const user = {
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    };
+
+    await global.testRequest.post("/api/v1/users").send(user);
+
+    const response = await global.testRequest
+      .post("/api/v1/sessions")
+      .send(user);
+
+    const { token } = response.body;
+
+    const profileResponse = await global.testRequest
+      .get("/api/v1/profile")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(profileResponse.status).toBe(200);
+    expect(profileResponse.body).toHaveProperty("id");
+    expect(profileResponse.body.email).toBe(user.email);
+  });
 });
