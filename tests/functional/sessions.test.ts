@@ -62,4 +62,22 @@ describe("Sessions functional tests", () => {
     expect(profileResponse.body).toHaveProperty("id");
     expect(profileResponse.body.email).toBe(user.email);
   });
+
+  it("should not be able to recover user profile data when auth token is invalid", async () => {
+    const user = {
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    };
+
+    await global.testRequest.post("/api/v1/users").send(user);
+
+    const invalidAuthToken = faker.datatype.uuid();
+
+    const profileResponse = await global.testRequest
+      .get("/api/v1/profile")
+      .set("Authorization", `Bearer ${invalidAuthToken}`);
+
+    expect(profileResponse.status).toBe(401);
+  });
 });
