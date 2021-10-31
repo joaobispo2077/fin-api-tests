@@ -1,3 +1,7 @@
-import { app } from './app';
+import { App } from "./app";
 
-app.listen(3333, () => { console.log('Server is running') });
+(async () => {
+  const app = new App();
+  await app.init();
+  app.start();
+})();
