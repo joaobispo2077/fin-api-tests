@@ -18,4 +18,24 @@ describe("Sessions functional tests", () => {
     expect(response.body).toHaveProperty("token");
     expect(response.body).toHaveProperty("user");
   });
+
+  it("should not be able to authenticate a user with wrong credentials", async () => {
+    const user = {
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    };
+
+    const userWithWrongCredentials = Object.assign({}, user, {
+      password: faker.internet.password(),
+    });
+
+    await global.testRequest.post("/api/v1/users").send(user);
+
+    const response = await global.testRequest
+      .post("/api/v1/sessions")
+      .send(userWithWrongCredentials);
+
+    expect(response.status).toBe(401);
+  });
 });
